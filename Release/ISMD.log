@@ -1,0 +1,26 @@
+﻿已經開始建置於 2016/5/5 下午 23:13:20。
+     1>節點 2 (Build 目標) 上的專案 "e:\shihwei\documents\visual studio 2013\Projects\ISMD\ISMD\ISMD.vcxproj"。
+     1>ClCompile:
+         D:\Program Files\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D _CRT_SECURE_NO_WARNINGS /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt ISMD_main.cpp
+         ISMD_main.cpp
+     1>d:\opencv\build\include\opencv2\flann\dist.h : warning C4819: 檔案含有無法在目前字碼頁 (950) 中表示的字元。請以 Unicode 格式儲存檔案以防止資料遺失
+     1>D:\opencv\build\include\opencv2/legacy/compat.hpp : warning C4819: 檔案含有無法在目前字碼頁 (950) 中表示的字元。請以 Unicode 格式儲存檔案以防止資料遺失
+     1>ISMD_main.cpp(104): warning C4244: '正在初始化' : 將 'double' 轉換為 'int'，由於類型不同，可能導致資料遺失
+     1>ISMD_main.cpp(105): warning C4244: '引數' : 將 'double' 轉換為 'int'，由於類型不同，可能導致資料遺失
+     1>ISMD_main.cpp(226): warning C4244: '=' : 將 'int' 轉換為 'float'，由於類型不同，可能導致資料遺失
+     1>ISMD_main.cpp(227): warning C4244: '=' : 將 'int' 轉換為 'float'，由於類型不同，可能導致資料遺失
+     1>ISMD_main.cpp(228): warning C4244: '=' : 將 'int' 轉換為 'float'，由於類型不同，可能導致資料遺失
+     1>ISMD_main.cpp(229): warning C4244: '=' : 將 'int' 轉換為 'float'，由於類型不同，可能導致資料遺失
+     1>ISMD_main.cpp(86): warning C4101: 'processing_cam' : 未參考的區域變數
+       Link:
+         D:\Program Files\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"e:\shihwei\documents\visual studio 2013\Projects\ISMD\Release\ISMD.exe" /NOLOGO opencv_calib3d2411.lib opencv_contrib2411.lib opencv_core2411.lib opencv_features2d2411.lib opencv_flann2411.lib opencv_gpu2411.lib opencv_highgui2411.lib opencv_imgproc2411.lib opencv_legacy2411.lib opencv_ml2411.lib opencv_nonfree2411.lib opencv_objdetect2411.lib opencv_ocl2411.lib opencv_photo2411.lib opencv_stitching2411.lib opencv_superres2411.lib opencv_ts2411.lib opencv_video2411.lib opencv_videostab2411.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"e:\shihwei\documents\visual studio 2013\Projects\ISMD\Release\ISMD.pdb" /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"e:\shihwei\documents\visual studio 2013\Projects\ISMD\Release\ISMD.lib" /MACHINE:X86 /SAFESEH Release\codebook.obj
+         Release\ISMD_main.obj
+         Release\ViBe.obj
+         正在產生程式碼
+         已完成程式碼產生
+         ISMD.vcxproj -> e:\shihwei\documents\visual studio 2013\Projects\ISMD\Release\ISMD.exe
+     1>專案 "e:\shihwei\documents\visual studio 2013\Projects\ISMD\ISMD\ISMD.vcxproj" (Build 目標) 建置完成。
+
+建置成功。
+
+經過時間 00:00:01.93
