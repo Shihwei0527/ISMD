@@ -6,11 +6,11 @@
 // ***  3. GMM	(Gaussian Mixture Model)
 // ******************************************************************************
 
-// #define ViBe
- #define CBM
+ #define ViBe
+// #define CBM
 // #define GMM
 
-#define camera_num 2  
+#define camera_num 1 // 可任意更改相機or影片檔數量
 
 #include <opencv.hpp>
 #include <iostream>
@@ -23,11 +23,12 @@ using namespace std;
 const Scalar RED(0, 0, 255);
 const string videoStreamAddress = "http://admin:ipvrnt2k@140.115.155.21/video1.mjpg";
 
-char *videos[] = { "../../image/Cloud 160410.avi", "../../image/Cloud 160412.avi", "../../image/Sun 160408.avi"};		// 各個影片檔的檔名
+char *videos[] = { "../../image/Cloud 160410.avi", "../../image/Cloud 160412.avi", "../../image/Sun 160408.avi", "../../image/Night 160426.avi"};		// 各個影片檔的檔名
 char WinName[15];
 // char WinName2[15];
 vector<vector<Point> > contours[camera_num];
 Rect bBox[camera_num];
+int	 imageLen[camera_num];
 
 #ifdef ViBe		// Visual Background extractor
 	#include "ViBe.h"
@@ -38,13 +39,12 @@ Rect bBox[camera_num];
 	#include "codebook.h"
 	codeBook**	image_codebook;		// 指向 codebook 結構的 array，array的長度等於影像 pixel 數量
 	unsigned	codeBook_Bounds[CHANNELS];
-	unsigned char**		pColor; //YUV pointer
-	int		imageLen;
+	unsigned char**		pColor; //YUV pointer	
 	int		nChannels = CHANNELS;
 	int		minMod[CHANNELS];
 	int		maxMod[CHANNELS];
 	Mat	yuvImage[camera_num];
-	Mat	ImaskCodeBook(600, 800, CV_8UC1, Scalar(0));
+	// Mat	ImaskCodeBook[camera_num]; // (600, 800, CV_8UC1, Scalar(0));
 #endif
 
 void put_Font(Mat &img){
@@ -91,20 +91,28 @@ int main() {
 		}
 		capture[i] >> rawImage[i];
 		xywhdata[i].create(4, 1, CV_32F);
+		if (rawImage[i].rows > 1000 || rawImage[i].cols > 1000) {
+			imageLen[i] = rawImage[i].cols*0.5 * rawImage[i].rows*0.5;
+		}
+		else imageLen[i] = rawImage[i].cols * rawImage[i].rows;
 	}
-
-	int imageLen = rawImage[0].cols*0.5 * rawImage[0].rows*0.5;
-	Size writefilesize(rawImage[0].cols*0.5, rawImage[0].rows*0.5);
+	// int imageLen = rawImage[0].cols*0.5 * rawImage[0].rows*0.5;
+	// Size writefilesize(rawImage[0].cols*0.5, rawImage[0].rows*0.5);
 
 	for (int i = 0; i < camera_num; i++){
-		foreground[i].create(writefilesize, CV_8UC1);
-		xywhdata[i].create(4, 1, CV_32F);
-		resize(rawImage[i], resizedImg[i], writefilesize);
+		if (rawImage[i].rows > 1000 || rawImage[i].cols > 1000) {
+			foreground[i].create(Size(rawImage[i].cols / 2, rawImage[i].rows / 2), CV_8UC1);
+			xywhdata[i].create(4, 1, CV_32F);
+			resize(rawImage[i], resizedImg[i], Size(rawImage[i].cols / 2, rawImage[i].rows / 2));
+		}
+		else {
+			foreground[i].create(Size(rawImage[i].cols, rawImage[i].rows), CV_8UC1);
+			xywhdata[i].create(4, 1, CV_32F);
+			resize(rawImage[i], resizedImg[i], Size(rawImage[i].cols, rawImage[i].rows));
+		}
 	}
-
 	//capture[0].open(*(videos));
 	//capture[1].open(*(videos + 1));
-
 #ifdef ViBe
 	for (int i = 0; i < camera_num; i++){
 		Vibe_Bgs[i].init(resizedImg[i]);
@@ -118,12 +126,12 @@ int main() {
 	pColor = new unsigned char*[camera_num];
 
 	for (int i = 0; i < camera_num; i++){
-		image_codebook[i] = new codeBook[imageLen];
+		image_codebook[i] = new codeBook[imageLen[i]];
 		pColor[i] = new unsigned char[1];
 	}
 
 	for (int i = 0; i < camera_num; i++)	// 初始化每個codeword數目為0
-		for (int j = 0; j < imageLen; j++) {
+		for (int j = 0; j < imageLen[i]; j++) {
 			image_codebook[i][j].numEntries = 0;
 		}
 		
@@ -138,7 +146,11 @@ int main() {
 	for (int i = 0, processing_cam = 0;; i++, processing_cam++) {
 		processing_cam = processing_cam % camera_num;
 		capture[processing_cam] >> rawImage[processing_cam];
-		resize(rawImage[processing_cam], resizedImg[processing_cam], writefilesize);
+		if (rawImage[processing_cam].rows > 1000 || rawImage[processing_cam].cols > 1000) {
+			resize(rawImage[processing_cam], resizedImg[processing_cam], Size(rawImage[processing_cam].cols / 2, rawImage[processing_cam].rows / 2));
+		}
+		else resize(rawImage[processing_cam], resizedImg[processing_cam], Size(rawImage[processing_cam].cols, rawImage[processing_cam].rows));
+		// resize(rawImage[processing_cam], resizedImg[processing_cam], writefilesize);
 		if (rawImage[processing_cam].empty())
 			break;
 		// *** 開始建立 ViBe 背景，然後做背景相減	 ***************************************************************
@@ -154,7 +166,7 @@ int main() {
 			if (i <= 15) { // 15個frame内進行背景學習
 				pColor[processing_cam] = (unsigned char*)(yuvImage[processing_cam].data);  // 指向yuvImage影像的通道數據
 				//for (int cc = 0; cc < 2; cc++) {
-					for (int c = 0; c < imageLen; c++) {
+				for (int c = 0; c < imageLen[processing_cam]; c++) {
 						updateCodeBook(pColor[processing_cam], image_codebook[processing_cam][c], codeBook_Bounds, nChannels);
 						// 對每個像素,調用此函數,捕捉背景中相關變化圖像
 						pColor[processing_cam] += 3;
@@ -162,7 +174,7 @@ int main() {
 					}
 				//}
 				if (i == 15) { // 到15 frame時調用下面函數,刪除codebook中舊的codeword
-					for (int c = 0; c < imageLen; c++)
+					for (int c = 0; c < imageLen[processing_cam]; c++)
 						clearStaleEntries(image_codebook[processing_cam][c]);
 				}
 			}
@@ -171,7 +183,7 @@ int main() {
 			pColor[processing_cam] = (unsigned char *)(yuvImage[processing_cam].data); //3 channel yuv image
 			unsigned char *pMask = (unsigned char *)(foreground[processing_cam].data); //1 channel image
 			// 指向ImaskCodeBook 通道數據序列的首元素
-			for (int c = 0; c < imageLen; c++) {
+			for (int c = 0; c < imageLen[processing_cam]; c++) {
 				maskPixelCodeBook = backgroundDiff(pColor[processing_cam], image_codebook[processing_cam][c], nChannels, minMod, maxMod, &foreground_nums);
 				*pMask++ = maskPixelCodeBook;
 				pColor[processing_cam] += 3;
@@ -195,13 +207,13 @@ int main() {
 			if (bBox[processing_cam].area() >= 180) {	// 長方形區域面積超過 180，則畫在影像上
 
 				//getOrientation(contours[i], tmpraw);//畫框
-				// Mat xywhdata(4, 1, CV_32F);
 				xywhdata[processing_cam].at<float>(0) = bBox[processing_cam].x + bBox[processing_cam].width / 2;
 				xywhdata[processing_cam].at<float>(1) = bBox[processing_cam].y + bBox[processing_cam].height / 2;
 				xywhdata[processing_cam].at<float>(2) = bBox[processing_cam].width;
 				xywhdata[processing_cam].at<float>(3) = bBox[processing_cam].height;
 
-				cout << "cam1  ( " << xywhdata[processing_cam].at<float>(0) << "," << xywhdata[processing_cam].at<float>(1) << " )\n";
+				cout << "cam" << processing_cam << " ( " << xywhdata[processing_cam].at<float>(0) << "," << xywhdata[processing_cam].at<float>(1) << " )\n";
+				// system("pause");
 				rectangle(resizedImg[processing_cam], bBox[processing_cam], Scalar(255, 255, 255), 2);
 			}
 			if (foreground_nums > (resizedImg[processing_cam].cols * resizedImg[processing_cam].rows * 0.2)) {
@@ -209,7 +221,7 @@ int main() {
 				put_Font(resizedImg[processing_cam]);
 				cout << "warning" << endl;
 			}
-			cout << setprecision(3) << "foreground : " << (float)foreground_nums / (float)imageLen * 100 << " %" << endl;
+			cout << setprecision(3) << "foreground : " << (float)foreground_nums / (float)imageLen[processing_cam] * 100 << " %" << endl;
 		}
 
 		sprintf(WinName, "Camera%d", processing_cam);
