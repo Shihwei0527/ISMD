@@ -10,7 +10,7 @@ using namespace std;
 #define NUM_SAMPLES 20 // 每個像素點的樣本個數 number of samples per pixel
 #define MIN_MATCHES 2 // #min指數 number of close samples for being part of the background
 #define RADIUS 20 // Sqthere半徑 radius of the pshere
-#define SUBSAMPLE_FACTOR 16 //子採樣率 amount of random subsampling
+#define SUBSAMPLE_FACTOR 1 //子採樣率 amount of random subsampling，越小背景更新越快
 
 
 class ViBe_BGS

@@ -31,7 +31,7 @@ typedef struct code_book {
 
 /*  --------------- 下面為 codebook element 的 functions -------------  */
 
-int updateCodeBook (unsigned char *p, codeBook &c, unsigned *cbBounds, int numChannels);
+void updateCodeBook (unsigned char *p, codeBook &c, unsigned *cbBounds, int numChannels, int ccc);
 		
 	/*  --------------- updateCodeBook 的 功能與參數說明 -------------  */
 

@@ -6,10 +6,10 @@
 
 using namespace std;
 
-int updateCodeBook(unsigned char *p, codeBook &c, unsigned *cbBounds, int numChannels) {
+void updateCodeBook(unsigned char *p, codeBook &c, unsigned *cbBounds, int numChannels, int ccc) {
 
-	if (c.numEntries == 0) 
-		c.t = 0;	// codebook 中 codeword 為零時，初始化時間為 0，c.numEntries:codeword 的數量
+	if (c.numEntries == 0)
+		c.t = 0;		// codebook 中 codeword 為零時，初始化時間為 0，c.numEntries:codeword 的數量
 	c.t += 1;		// Record learning event  每調用一次加一，即每一影像加一
 
 	// **********************************************************************************************************
@@ -19,10 +19,10 @@ int updateCodeBook(unsigned char *p, codeBook &c, unsigned *cbBounds, int numCha
 
 	for (n = 0; n < numChannels; n++)	{
 		high[n] = *(p + n) + *(cbBounds + n);	// *(p+n) 和 p[n] 結果等價，經試驗*(p+n) 速度更快
-		if (high[n] > 255) 
+		if (high[n] > 255)
 			high[n] = 255;
 		low[n] = *(p + n) - *(cbBounds + n);
-		if (low[n] < 0) 
+		if (low[n] < 0)
 			low[n] = 0;
 		//*** 用 p 所指像素通道數，加減 cbBonds 中數值，作為此像素的門檻值上下限
 	}
@@ -36,9 +36,9 @@ int updateCodeBook(unsigned char *p, codeBook &c, unsigned *cbBounds, int numCha
 		// 遍歷此codebook每個codeword,測試p像素是否滿足其中之一
 		matchChannel = 0;
 		for (n = 0; n<numChannels; n++) {			//遍歷某個codeword的每個通道
-		
+
 			if ((c.cb[i]->learnLow[n] <= *(p + n)) && (*(p + n) <= c.cb[i]->learnHigh[n])) { //Found an entry for this channel
-				
+
 				// 如果p 像素通道數值在該codeword門檻值上下限之間，c.cb[i]代表第i個codeword
 				matchChannel++;
 			}
@@ -111,7 +111,7 @@ int updateCodeBook(unsigned char *p, codeBook &c, unsigned *cbBounds, int numCha
 		if (c.cb[i]->learnLow[n] > low[n])
 			c.cb[i]->learnLow[n] -= 1;
 	}
-	return(i);
+	// return(i);
 }
 
 unsigned char backgroundDiff(unsigned char *p, codeBook &c, int numChannels, int *minMod, int *maxMod, int* foreground_nums){
